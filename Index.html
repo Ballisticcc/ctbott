@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ballistic AI Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }header {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
+}
+
+.chatbox {
+  width: 90%;
+  max-width: 600px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.messages {
+  height: 400px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #121212;
+  border-radius: 8px;
+}
+
+.user-msg, .bot-msg {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.user-msg {
+  background-color: #2c5364;
+  text-align: right;
+}
+
+.bot-msg {
+  background-color: #203a43;
+  text-align: left;
+}
+
+input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  margin-left: 10px;
+  cursor: pointer;
+  background-color: #00adb5;
+  color: white;
+  font-weight: bold;
+}
+
+.info-bar {
+  margin-top: 30px;
+  padding: 15px;
+  text-align: center;
+  max-width: 700px;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.voice-toggle {
+  margin-top: 10px;
+}
+
+  </style>
+</head>
+<body>
+  <header>🎯 Ballistic AI Chatbot</header>  <div class="chatbox">
+    <div class="messages" id="messages"></div>
+    <input type="text" id="userInput" placeholder="Type your message here...">
+    <button onclick="sendMessage()">Send</button><div class="voice-toggle">
+  <label><input type="checkbox" id="voiceSwitch" checked> 🔊 Voice Response On</label>
+</div>
+
+  </div>  <div class="info-bar">
+    BALLISTIC AI chatbot is created by <b>The Cognito group</b> for the theme <b>"Evolution of AI"</b> to demonstrate one of the many examples of AI, how it can be used for educational purposes and make the world a safer place.
+  </div>  <script>
+    const messagesContainer = document.getElementById('messages');
+    const voiceSwitch = document.getElementById('voiceSwitch');
+
+    function appendMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = sender === 'user' ? 'user-msg' : 'bot-msg';
+      msg.innerText = text;
+      messagesContainer.appendChild(msg);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      if (sender === 'bot' && voiceSwitch.checked) {
+        speak(text);
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      appendMessage(userText, 'user');
+      input.value = '';
+
+      const lower = userText.toLowerCase();
+      let response = "Sorry, I didn't understand that.";
+
+      if (lower.includes("what is ai")) {
+        response = "AI stands for Artificial Intelligence. It's a field in computer science that aims to create systems capable of intelligent behavior.";
+      } else if (lower.includes("joke")) {
+        response = "Why did the robot go on vacation? Because it needed to recharge its batteries!";
+      } else if (lower.includes("who made you") || lower.includes("who created you")) {
+        response = "I was created by The Cognito group as a demo for the evolution of AI!";
+      } else if (lower.includes("boon")) {
+        response = "AI boons include automation, precision, and scalability in work. It helps in medicine, safety, and education.";
+      } else if (lower.includes("bane")) {
+        response = "AI banes include job displacement, bias in decisions, and ethical concerns in control and misuse.";
+      } else if (lower.includes("weather")) {
+        response = "I can't fetch real-time weather info yet, but I suggest checking a weather website or app!";
+      } else if (lower.includes("wikipedia")) {
+        response = "Fetching live Wikipedia content requires online API integration, which isn't available in offline mode.";
+      }
+
+      setTimeout(() => appendMessage(response, 'bot'), 600);
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      utterance.volume = 1;
+      speechSynthesis.speak(utterance);
+    }
+  </script></body>
+</html>
