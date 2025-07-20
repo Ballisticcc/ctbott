@@ -1,158 +1,130 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ballistic AI Chatbot</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f0f0f;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .container {
-      margin-top: 40px;
-      width: 95%;
-      max-width: 600px;
-      padding: 20px;
-      background: #1a1a1a;
-      border-radius: 20px;
-      box-shadow: 0 0 15px #00f2ff;
-    }
-    h1 {
-      text-align: center;
-      color: #00f2ff;
-      margin-bottom: 10px;
-    }
-    .description {
-      font-size: 14px;
-      text-align: center;
-      color: #ccc;
-      margin-bottom: 20px;
-    }
-    #chatbox {
-      max-height: 400px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid #333;
-      border-radius: 10px;
-      background-color: #121212;
-      margin-bottom: 10px;
-    }
-    .msg {
-      margin: 8px 0;
-    }
-    .user {
-      color: #00f2ff;
-    }
-    .bot {
-      color: #00ff7f;
-    }
-    #inputBox {
-      display: flex;
-      gap: 10px;
-    }
-    #input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-    }
-    #send {
-      padding: 10px 20px;
-      background-color: #00f2ff;
-      color: black;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .preset-btns button {
-      background: #333;
-      color: white;
-      border: 1px solid #00f2ff;
-      margin: 5px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ballistic AI Chatbot</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom right, #121212, #1f1f1f);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .chat-container {
+            width: 90%;
+            max-width: 700px;
+            background-color: #1e1e2f;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #2b2b3c;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .chat-input {
+            display: flex;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px 0 0 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #ff4081;
+            color: white;
+            font-weight: bold;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user {
+            color: #90caf9;
+        }
+        .bot {
+            color: #80cbc4;
+        }
+        .info-box {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #ccc;
+            background-color: #292940;
+            padding: 10px;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🤖 Ballistic AI</h1>
-    <div class="description">
-      Created by The Cognito Group<br>
-      A demonstration of AI’s evolution and educational power.
-    </div>
-    <div id="chatbox"></div>
-    <div id="inputBox">
-      <input type="text" id="input" placeholder="Ask me anything..." />
-      <button id="send">Send</button>
-    </div>
-    <div class="preset-btns">
-      <button onclick="preset('What is AI?')">What is AI?</button>
-      <button onclick="preset('Tell me a joke')">Tell me a joke</button>
-      <button onclick="preset('What is today\'s weather?')">Today's Weather</button>
-      <button onclick="preset('Search Wikipedia for Artificial Intelligence')">Wikipedia: AI</button>
-    </div>
-  </div>  <script>
-    const chatbox = document.getElementById("chatbox");
-    const input = document.getElementById("input");
-    const send = document.getElementById("send");
+    <div class="chat-container">
+        <h2>Ballistic AI Chatbot 🤖</h2>
+        <div class="chat-box" id="chatBox"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Ask something...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div class="info-box">
+            BALLISTIC AI chatbot is created by The Cognito group for the topic "Evolution of AI" to demonstrate how AI can be used for educational purposes and make the world a safer place.
+        </div>
+    </div><script>
+    const chatBox = document.getElementById('chatBox');
 
-    const speak = (text) => {
-      const synth = window.speechSynthesis;
-      const utterance = new SpeechSynthesisUtterance(text);
-      synth.speak(utterance);
-    };
-
-    const appendMessage = (sender, message) => {
-      const msg = document.createElement("div");
-      msg.classList.add("msg");
-      msg.classList.add(sender);
-      msg.innerText = `${sender === "user" ? "You" : "Ballistic"}: ${message}`;
-      chatbox.appendChild(msg);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    };
-
-    const preset = (text) => {
-      input.value = text;
-      handleSend();
-    };
-
-    const handleSend = async () => {
-      const text = input.value.trim();
-      if (!text) return;
-      appendMessage("user", text);
-      input.value = "";
-
-      try {
-        const res = await fetch(
-          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(text)}`
-        );
-        const data = await res.json();
-
-        if (data.extract) {
-          appendMessage("bot", data.extract);
-          speak(data.extract);
-        } else {
-          appendMessage("bot", "I found nothing on Wikipedia.");
-          speak("I couldn't find anything on Wikipedia.");
+    async function getWikipediaSummary(query) {
+        const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error('Wikipedia API error');
+            }
+            const data = await response.json();
+            if (data.extract && !data.type?.includes("disambiguation")) {
+                return data.extract;
+            } else {
+                return "I found multiple results for that. Please be more specific.";
+            }
+        } catch (error) {
+            console.error('Wiki error:', error);
+            return "Sorry, I couldn’t find anything useful on Wikipedia.";
         }
-      } catch (err) {
-        appendMessage("bot", "Error fetching data. Try again later.");
-        speak("There was an error. Try again later.");
-      }
-    };
+    }
 
-    send.onclick = handleSend;
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") handleSend();
-    });
-  </script></body>
+    function appendMessage(sender, text) {
+        const message = document.createElement('div');
+        message.classList.add('message');
+        message.classList.add(sender);
+        message.textContent = `${sender === 'user' ? 'You' : 'Bot'}: ${text}`;
+        chatBox.appendChild(message);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const userInput = document.getElementById('userInput');
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        appendMessage('user', text);
+        userInput.value = '';
+
+        const botReply = await getWikipediaSummary(text);
+        appendMessage('bot', botReply);
+    }
+</script>
+
+</body>
 </html>
