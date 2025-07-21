@@ -1,216 +1,165 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ballistic AI Chatbot</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <title>Ballistic AI</title>
   <style>
     body {
-      margin: 0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #2c3e50, #3498db);
-      color: #fff;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-    }.header {
-  text-align: center;
-  padding: 20px;
-  animation: fadeInDown 1s ease;
-}
-
-.header h1 {
-  font-size: 2.5rem;
-}
-
-.header p {
-  font-size: 1rem;
-  margin-top: 10px;
-  color: #ecf0f1;
-}
-
-.chatbot {
-  background: #1f2a38;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 500px;
-  padding: 20px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  animation: slideInUp 1s ease;
-}
-
-.chatlog {
-  height: 300px;
-  overflow-y: auto;
-  padding-right: 10px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.chatlog div {
-  padding: 10px;
-  border-radius: 10px;
-  background: #34495e;
-}
-
-.user {
-  align-self: flex-end;
-  background-color: #2980b9;
-}
-
-.bot {
-  align-self: flex-start;
-  background-color: #27ae60;
-}
-
-.input-area {
-  display: flex;
-  gap: 10px;
-}
-
-input[type="text"] {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-}
-
-button {
-  background: #2980b9;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.interactive-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  justify-content: center;
-}
-
-.interactive-buttons button {
-  padding: 5px 10px;
-  background-color: #8e44ad;
-  border-radius: 8px;
-}
-
-.footer {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #bdc3c7;
-}
-
-@keyframes fadeInDown {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slideInUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-  </style>
-</head><body>
-  <div class="header">
-    <h1>🤖 Ballistic AI Chatbot</h1>
-    <p>Created by The Cognito Group — Evolution of AI Project</p>
-    <p><em>Demonstrates AI's educational power to make the world smarter & safer.</em></p>
-  </div>  <div class="chatbot">
-    <div class="chatlog" id="chatlog"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type a message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-    <div class="interactive-buttons">
-      <button onclick="autoMessage('What is AI?')">What is AI?</button>
-      <button onclick="autoMessage('Tell me a joke')">Tell a joke</button>
-      <button onclick="autoMessage('Today\'s weather')">Today’s Weather</button>
-      <button onclick="autoMessage('Who invented computer?')">Who invented computer?</button>
-    </div>
-  </div>  <div class="footer">
-    <p>Ballistic Bot responds with speech + smart Wikipedia fetching + casual conversation. Powered by OpenAI-style logic ✨</p>
-  </div>  <script>
-    const chatlog = document.getElementById('chatlog');
-    const synth = window.speechSynthesis;
-
-    function addMessage(text, sender) {
-      const msg = document.createElement('div');
-      msg.classList.add(sender);
-      msg.textContent = text;
-      chatlog.appendChild(msg);
-      chatlog.scrollTop = chatlog.scrollHeight;
+      color: white;
+      overflow: hidden;
     }
+    h1 {
+      margin-top: 0;
+      font-size: 2.5rem;
+      color: #00ffd0;
+    }
+    #chatbox {
+      width: 90%;
+      max-width: 600px;
+      height: 400px;
+      background: #1a1a1a;
+      border: 2px solid #00ffd0;
+      border-radius: 10px;
+      overflow-y: auto;
+      padding: 20px;
+      margin-bottom: 1rem;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .user {
+      color: #ffd700;
+    }
+    .bot {
+      color: #00ffd0;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+      width: 70%;
+      max-width: 400px;
+      outline: none;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 1rem;
+      margin-left: 10px;
+      background-color: #00ffd0;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #info {
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      max-width: 600px;
+      text-align: center;
+      color: #ccc;
+    }
+    .robot-face {
+      font-size: 4rem;
+      margin-bottom: 10px;
+      animation: bounce 1.5s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .quick-btns {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .quick-btns button {
+      background-color: #333;
+      color: #00ffd0;
+      border: 1px solid #00ffd0;
+    }
+  </style>
+</head>
+<body>
+  <div class="robot-face">🤖</div>
+  <h1>Ballistic AI Chatbot</h1>
+  <div id="chatbox"></div>
+  <input type="text" id="userInput" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+  <div class="quick-btns">
+    <button onclick="sendQuick('What is AI?')">What is AI?</button>
+    <button onclick="sendQuick('Tell me a joke')">Tell me a joke</button>
+    <button onclick="sendQuick('Today\'s weather')">Today's weather</button>
+    <button onclick="sendQuick('Who created you?')">Who created you?</button>
+    <button onclick="sendQuick('I\'m bored')">I'm bored</button>
+  </div>
+  <div id="info">BALLISTIC AI chatbot is created by The Cognito group for the Cognito topic: <b>Evolution of AI</b>, to demonstrate one of the many examples of AI—how it can be used for educational purposes and make the world a safer place. 🌍</div>  <script>
+    const chatbox = document.getElementById('chatbox');
+    const input = document.getElementById('userInput');
 
-    function speak(text) {
-      const utter = new SpeechSynthesisUtterance(text);
-      synth.cancel();
+    const synth = window.speechSynthesis;
+    let selectedVoice = null;
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      const voices = synth.getVoices();
+      selectedVoice = voices.find(voice => voice.name.includes('UK English Male')) || voices[0];
+    };
+
+    const botResponses = {
+      'what is ai': 'AI stands for Artificial Intelligence. It refers to machines that can perform tasks that typically require human intelligence. 🧠',
+      'who created you': 'I was created by The Cognito group as a demo for AI evolution. 🛠️',
+      'tell me a joke': 'Why did the AI get promoted? Because it was too intelligent to ignore! 🤖😂',
+      'today's weather': 'I can't fetch real-time weather data yet, but sunny days ahead, I hope! ☀️',
+      'i'm bored': 'Want to learn something new or hear a fact? Just ask! 🎯',
+      'hello': 'Hey there! How can I help you today? 👋',
+      'hi': 'Hello! Ask me anything about AI or life! 🤝',
+      'how are you': 'Feeling electric ⚡ and ready to chat!',
+      'bye': 'See you later, human friend! ✌️',
+      'thank you': 'You're always welcome! 💙'
+    };
+
+    function sendMessage() {
+      const userText = input.value.trim().toLowerCase();
+      if (userText === '') return;
+
+      chatbox.innerHTML += `<div class="message user">You: ${userText}</div>`;
+      input.value = '';
+
+      let botReply = 'Sorry, I didn\'t understand that. 🤔';
+
+      for (let key in botResponses) {
+        if (userText.includes(key)) {
+          botReply = botResponses[key];
+          break;
+        }
+      }
+
+      chatbox.innerHTML += `<div class="message bot">Ballistic AI: ${botReply}</div>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      const utter = new SpeechSynthesisUtterance(botReply);
+      if (selectedVoice) utter.voice = selectedVoice;
       synth.speak(utter);
     }
 
-    async function fetchWikiSummary(query) {
-      const search = query.toLowerCase().replace(/^(what is|who is|define|explain|tell me about)/, '').trim();
-      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(search)}`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.extract) return data.extract;
-      } catch (err) {
-        return null;
-      }
-      return null;
-    }
-
-    async function generateBotResponse(input) {
-      const casualResponses = {
-        "hi": "Hey there! 👋",
-        "hello": "Hello! How can I help?",
-        "how are you": "I'm just a bot, but I'm functioning great!",
-        "what's up": "Just chilling in cyberspace. You?",
-        "tell me a joke": "Why did the computer visit the doctor? It had a virus!",
-        "bye": "Goodbye! Have a great day!",
-        "thank you": "You're welcome, buddy!",
-        "you are dumb": "Ouch! But I still love you 💔🤖",
-        "you are smart": "Thanks! You're not too bad yourself 😎",
-        "i'm sad": "Aww, I'm here for you. Wanna talk about it?",
-        "i'm bored": "Wanna hear a fun fact or a joke?"
-      };
-
-      const lower = input.toLowerCase().trim();
-      if (casualResponses[lower]) return casualResponses[lower];
-
-      const summary = await fetchWikiSummary(input);
-      if (summary) return summary;
-
-      return "Hmm, I didn't quite get that. Wanna try rephrasing or ask something else?";
-    }
-
-    async function sendMessage() {
-      const inputField = document.getElementById('userInput');
-      const userText = inputField.value.trim();
-      if (!userText) return;
-
-      addMessage(userText, 'user');
-      inputField.value = '';
-
-      const botReply = await generateBotResponse(userText);
-      addMessage(botReply, 'bot');
-      speak(botReply);
-    }
-
-    function autoMessage(text) {
-      document.getElementById('userInput').value = text;
+    function sendQuick(message) {
+      input.value = message;
       sendMessage();
     }
-  </script></body></html>
+
+    input.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script></body>
+</html>
