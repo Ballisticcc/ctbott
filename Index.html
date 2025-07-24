@@ -1,109 +1,182 @@
-// FILE: index.html
+index.html
 
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chatbot Buddy</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ballistic Chatbot</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f2f5;
+      background-color: #121212;
+      color: white;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
-      margin: 0;
     }
-    .chatbox {
-      background: white;
+    #chatbox {
       width: 90%;
       max-width: 600px;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      height: 80vh;
+      margin-top: 20px;
+      background-color: #1e1e1e;
+      border-radius: 10px;
       overflow-y: auto;
-      max-height: 500px;
+      padding: 10px;
+    }
+    #userInput {
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      margin-top: 10px;
+    }
+    #inputText {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+    #sendBtn {
+      padding: 10px;
+      background-color: #00aaff;
+      color: white;
+      border: none;
+      margin-left: 5px;
+      border-radius: 5px;
+      cursor: pointer;
     }
     .message {
       margin: 10px 0;
     }
     .bot {
-      color: blue;
+      color: #00ffaa;
     }
-    .user {
-      color: green;
-      text-align: right;
-    }
-    .inputArea {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
-    input {
-      width: 70%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 10px;
-      margin-left: 10px;
-      font-size: 16px;
+    .interactive-buttons button {
+      margin: 5px;
+      padding: 8px 12px;
+      background-color: #007acc;
       border: none;
-      background-color: #007bff;
       color: white;
-      border-radius: 4px;
+      border-radius: 5px;
       cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <h2>💬 AI Chatbot Buddy</h2>
-  <div class="chatbox" id="chatbox"></div>
-  <div class="inputArea">
-    <input type="text" id="userInput" placeholder="Ask me anything...">
-    <button onclick="sendMessage()">Send</button>
+  <h2>🤖 Ballistic Chatbot</h2>
+  <div id="chatbox"></div>
+  <div id="userInput">
+    <input type="text" id="inputText" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+  <div class="interactive-buttons">
+    <button onclick="sendPreset('What is AI?')">What is AI?</button>
+    <button onclick="sendPreset('Applications of AI in medicine?')">AI in Medicine</button>
+    <button onclick="sendPreset('How is AI used in commerce?')">AI in Commerce</button>
+    <button onclick="sendPreset('What is an AI factory?')">AI Factory</button>
+    <button onclick="sendPreset('Tell me a joke!')">Tell me a joke</button>
   </div>
   <script>
+    const chatbox = document.getElementById('chatbox');
+    const inputText = document.getElementById('inputText');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function appendMessage(message, sender) {
+      const div = document.createElement('div');
+      div.className = `message ${sender}`;
+      div.textContent = message;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function sendPreset(text) {
+      inputText.value = text;
+      sendMessage();
+    }
+
     async function sendMessage() {
-      const input = document.getElementById('userInput');
-      const message = input.value;
-      if (!message.trim()) return;appendMessage('You', message, 'user');
-  input.value = '';
+      const message = inputText.value.trim();
+      if (!message) return;
 
-  try {
-    const response = await fetch('http://localhost:3000/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ message })
+      appendMessage('You: ' + message, 'user');
+      inputText.value = '';
+      appendMessage('Thinking...', 'bot');
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message }),
+        });
+
+        const data = await response.json();
+        const botMessages = document.querySelectorAll('.bot');
+        botMessages[botMessages.length - 1].textContent = 'Bot: ' + data.reply;
+      } catch (error) {
+        appendMessage('Bot: Oops! Something went wrong.', 'bot');
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputText.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') sendMessage();
     });
-
-    const data = await response.json();
-    appendMessage('Bot', data.reply, 'bot');
-  } catch (err) {
-    appendMessage('Bot', "Oops! Couldn't fetch response. 😢", 'bot');
-  }
-}
-
-function appendMessage(sender, message, className) {
-  const chatbox = document.getElementById('chatbox');
-  const msgDiv = document.createElement('div');
-  msgDiv.className = `message ${className}`;
-  msgDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
-  chatbox.appendChild(msgDiv);
-  chatbox.scrollTop = chatbox.scrollHeight;
-}
-
   </script>
 </body>
-</html>// FILE: server.js (already updated and attached earlier in this file)
+</html>
+
+server.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const { Configuration, OpenAIApi } = require('openai');
+const path = require('path');
+const app = express();
+const port = process.env.PORT || 3000;
+
+const configuration = new Configuration({
+  apiKey: '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',
+});
+const openai = new OpenAIApi(configuration);
+
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname)));
+
+app.post('/api/chat', async (req, res) => {
+  const { message } = req.body;
+
+  try {
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are Ballistic, a smart, witty chatbot that answers questions related to AI, jokes, casual convos, and explains technical terms like "AI factory" in a simple and helpful way.',
+        },
+        {
+          role: 'user',
+          content: message,
+        },
+      ],
+    });
+
+    res.json({ reply: completion.data.choices[0].message.content });
+  } catch (error) {
+    res.json({ reply: "Sorry, I couldn't fetch that. Try again later." });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+Let me know if you want voice, music, or avatar features next 🎵🤖
 
