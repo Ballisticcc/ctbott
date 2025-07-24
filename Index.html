@@ -1,155 +1,109 @@
+// FILE: index.html
+
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ballistic AI Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot Buddy</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: #0f0f0f;
-      font-family: 'Segoe UI', sans-serif;
-      color: #f0f0f0;
-    }
-    .chat-container {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
       display: flex;
       flex-direction: column;
-      max-width: 800px;
-      margin: 50px auto;
-      padding: 20px;
-      background-color: #1e1e1e;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
-    }
-    .chat-box {
-      flex-grow: 1;
-      height: 400px;
-      overflow-y: auto;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: #121212;
-    }
-    .input-container {
-      display: flex;
-      gap: 10px;
-    }
-    input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #00ffc8;
-      border: none;
-      color: #000;
-      font-weight: bold;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .bot, .user {
-      margin: 5px 0;
-      padding: 8px;
-      border-radius: 6px;
-    }
-    .user {
-      background: #0044ff;
-      align-self: flex-end;
-    }
-    .bot {
-      background: #00ffc8;
-      color: #000;
-      align-self: flex-start;
-    }
-    .robot-face {
-      width: 60px;
-      height: 60px;
-      background: #00ffc8;
-      border-radius: 50%;
-      margin: 0 auto 10px;
-      display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 30px;
-      color: #000;
+      height: 100vh;
+      margin: 0;
+    }
+    .chatbox {
+      background: white;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      max-height: 500px;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .bot {
+      color: blue;
+    }
+    .user {
+      color: green;
+      text-align: right;
+    }
+    .inputArea {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    input {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px;
+      margin-left: 10px;
+      font-size: 16px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="robot-face">🤖</div>
-    <div class="chat-box" id="chat-box"></div>
-    <div class="input-container">
-      <input type="text" id="user-input" placeholder="Ask Ballistic anything...">
-      <button onclick="handleUserInput()">Send</button>
-    </div>
-  </div>  <script>
-    const chatBox = document.getElementById("chat-box");
-    const userInput = document.getElementById("user-input");
+  <h2>💬 AI Chatbot Buddy</h2>
+  <div class="chatbox" id="chatbox"></div>
+  <div class="inputArea">
+    <input type="text" id="userInput" placeholder="Ask me anything...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const message = input.value;
+      if (!message.trim()) return;appendMessage('You', message, 'user');
+  input.value = '';
 
-    async function handleUserInput() {
-      const input = userInput.value.trim();
-      if (!input) return;
-      appendMessage("user", input);
-      userInput.value = "";
+  try {
+    const response = await fetch('http://localhost:3000/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message })
+    });
 
-      // Custom commands
-      if (input.toLowerCase().includes("play a song")) {
-        const response = "🎵 Playing song... (simulated)";
-        appendMessage("bot", response);
-        speak("Here’s a sample track");
-        const audio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
-        audio.play();
-        return;
-      }
+    const data = await response.json();
+    appendMessage('Bot', data.reply, 'bot');
+  } catch (err) {
+    appendMessage('Bot', "Oops! Couldn't fetch response. 😢", 'bot');
+  }
+}
 
-      // OpenAI API logic
-      appendMessage("bot", "Thinking...");
-      const openai_response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
-        },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [
-            { role: "system", content: "You are Ballistic, a helpful, funny chatbot who explains clearly." },
-            { role: "user", content: input }
-          ]
-        })
-      });
+function appendMessage(sender, message, className) {
+  const chatbox = document.getElementById('chatbox');
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `message ${className}`;
+  msgDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+  chatbox.appendChild(msgDiv);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
 
-      const data = await openai_response.json();
-      const botReply = data.choices?.[0]?.message?.content || "Sorry, something went wrong.";
-      replaceLastBotMessage(botReply);
-      speak(botReply);
-    }
+  </script>
+</body>
+</html>// FILE: server.js (already updated and attached earlier in this file)
 
-    function appendMessage(sender, text) {
-      const msg = document.createElement("div");
-      msg.className = sender;
-      msg.innerText = text;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function replaceLastBotMessage(newText) {
-      const botMessages = document.querySelectorAll(".bot");
-      if (botMessages.length) {
-        botMessages[botMessages.length - 1].innerText = newText;
-      }
-    }
-
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text.replace(/\p{Emoji}/gu, ''));
-      utterance.voice = speechSynthesis.getVoices().find(v => v.name.includes("Google")) || null;
-      speechSynthesis.speak(utterance);
-    }
-  </script></body>
-</html>
