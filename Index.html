@@ -1,182 +1,135 @@
-index.html
-
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ballistic Chatbot</title>
+  <title>Ballistic - AI Chatbot</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #2c3e50, #3498db);
       margin: 0;
       padding: 0;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      justify-content: flex-start;
       height: 100vh;
     }
-    #chatbox {
-      width: 90%;
-      max-width: 600px;
-      height: 80vh;
-      margin-top: 20px;
-      background-color: #1e1e1e;
-      border-radius: 10px;
+    .chat-container {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      width: 400px;
+      max-width: 90%;
+      padding: 20px;
+    }
+    .chat-log {
+      height: 300px;
       overflow-y: auto;
       padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
     }
-    #userInput {
-      width: 90%;
-      max-width: 600px;
+    .chat-log div {
+      margin-bottom: 8px;
+    }
+    .user { color: #2c3e50; font-weight: bold; }
+    .bot { color: #27ae60; }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .buttons {
       display: flex;
+      justify-content: space-between;
       margin-top: 10px;
     }
-    #inputText {
+    .buttons button {
+      padding: 10px;
       flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-    }
-    #sendBtn {
-      padding: 10px;
-      background-color: #00aaff;
-      color: white;
-      border: none;
-      margin-left: 5px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .message {
-      margin: 10px 0;
-    }
-    .bot {
-      color: #00ffaa;
-    }
-    .interactive-buttons button {
       margin: 5px;
-      padding: 8px 12px;
-      background-color: #007acc;
+      border-radius: 8px;
       border: none;
+      background-color: #3498db;
       color: white;
-      border-radius: 5px;
       cursor: pointer;
+    }
+    .buttons button:hover {
+      background-color: #2980b9;
     }
   </style>
 </head>
 <body>
-  <h2>🤖 Ballistic Chatbot</h2>
-  <div id="chatbox"></div>
-  <div id="userInput">
-    <input type="text" id="inputText" placeholder="Type a message..." />
-    <button id="sendBtn">Send</button>
-  </div>
-  <div class="interactive-buttons">
-    <button onclick="sendPreset('What is AI?')">What is AI?</button>
-    <button onclick="sendPreset('Applications of AI in medicine?')">AI in Medicine</button>
-    <button onclick="sendPreset('How is AI used in commerce?')">AI in Commerce</button>
-    <button onclick="sendPreset('What is an AI factory?')">AI Factory</button>
-    <button onclick="sendPreset('Tell me a joke!')">Tell me a joke</button>
-  </div>
-  <script>
-    const chatbox = document.getElementById('chatbox');
-    const inputText = document.getElementById('inputText');
-    const sendBtn = document.getElementById('sendBtn');
+  <div class="chat-container">
+    <div class="chat-log" id="chat-log"></div>
+    <input type="text" id="user-input" placeholder="Say something..." />
+    <div class="buttons">
+      <button onclick="sendPredefined('What is AI?')">AI?</button>
+      <button onclick="sendPredefined('Explain AI Factory')">AI Factory</button>
+      <button onclick="sendPredefined('Role of AI in Commerce')">AI in Commerce</button>
+      <button onclick="sendPredefined('Role of AI in Medicine')">AI in Medicine</button>
+    </div>
+  </div>  <script>
+    const chatLog = document.getElementById("chat-log");
+    const userInput = document.getElementById("user-input");
 
-    function appendMessage(message, sender) {
-      const div = document.createElement('div');
-      div.className = `message ${sender}`;
-      div.textContent = message;
-      chatbox.appendChild(div);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
+    const synth = window.speechSynthesis;
 
-    function sendPreset(text) {
-      inputText.value = text;
-      sendMessage();
-    }
+    const casualReplies = {
+      "hi": "Hey there! I'm Ballistic. What can I do for you?",
+      "hello": "Hello, friend! Let's chat.",
+      "what's up": "Not much, just chilling in your browser 🤖",
+      "how are you": "Running smoothly, thanks! And you?",
+    };
 
-    async function sendMessage() {
-      const message = inputText.value.trim();
-      if (!message) return;
+    const aiAnswers = {
+      "what is ai": "AI stands for Artificial Intelligence. It's the simulation of human intelligence in machines.",
+      "explain ai factory": "An AI Factory is a concept where AI development is streamlined like a production line: data in, models trained, predictions out.",
+      "role of ai in commerce": "AI helps in e-commerce through personalized recommendations, chatbots, fraud detection, and inventory management.",
+      "role of ai in medicine": "In medicine, AI is used for diagnostics, drug discovery, personalized treatment, and robotic surgeries."
+    };
 
-      appendMessage('You: ' + message, 'user');
-      inputText.value = '';
-      appendMessage('Thinking...', 'bot');
+    function addMessage(sender, message) {
+      const div = document.createElement("div");
+      div.className = sender;
+      div.innerText = `${sender === 'user' ? 'You' : 'Ballistic'}: ${message}`;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
 
-      try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message }),
-        });
-
-        const data = await response.json();
-        const botMessages = document.querySelectorAll('.bot');
-        botMessages[botMessages.length - 1].textContent = 'Bot: ' + data.reply;
-      } catch (error) {
-        appendMessage('Bot: Oops! Something went wrong.', 'bot');
+      if (sender === "bot") {
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.voice = synth.getVoices().find(v => v.name.includes('Google') || v.name.includes('English'));
+        synth.speak(utterance);
       }
     }
 
-    sendBtn.addEventListener('click', sendMessage);
-    inputText.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') sendMessage();
+    function getBotReply(message) {
+      const lower = message.toLowerCase();
+      if (casualReplies[lower]) return casualReplies[lower];
+      for (let key in aiAnswers) {
+        if (lower.includes(key)) return aiAnswers[key];
+      }
+      return "Sorry, I didn’t get that. Try asking something about AI or just say hi!";
+    }
+
+    userInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        const msg = userInput.value.trim();
+        if (!msg) return;
+        addMessage("user", msg);
+        const reply = getBotReply(msg);
+        setTimeout(() => addMessage("bot", reply), 600);
+        userInput.value = "";
+      }
     });
-  </script>
-</body>
+
+    function sendPredefined(msg) {
+      userInput.value = msg;
+      userInput.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter" }));
+    }
+  </script></body>
 </html>
-
-server.js
-
-const express = require('express');
-const bodyParser = require('body-parser');
-const { Configuration, OpenAIApi } = require('openai');
-const path = require('path');
-const app = express();
-const port = process.env.PORT || 3000;
-
-const configuration = new Configuration({
-  apiKey: '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',
-});
-const openai = new OpenAIApi(configuration);
-
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname)));
-
-app.post('/api/chat', async (req, res) => {
-  const { message } = req.body;
-
-  try {
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are Ballistic, a smart, witty chatbot that answers questions related to AI, jokes, casual convos, and explains technical terms like "AI factory" in a simple and helpful way.',
-        },
-        {
-          role: 'user',
-          content: message,
-        },
-      ],
-    });
-
-    res.json({ reply: completion.data.choices[0].message.content });
-  } catch (error) {
-    res.json({ reply: "Sorry, I couldn't fetch that. Try again later." });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-Let me know if you want voice, music, or avatar features next 🎵🤖
-
